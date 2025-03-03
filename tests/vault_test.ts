@@ -22,6 +22,15 @@ Clarinet.test({
     assertEquals(block.receipts.length, 1);
     assertEquals(block.height, 2);
     assertEquals(block.receipts[0].result.expectOk(), true);
+    
+    // Try creating duplicate vault
+    let block2 = chain.mineBlock([
+      Tx.contractCall("vault", "create-vault", 
+        [types.none(), types.uint(2), types.none()], 
+        wallet_1.address
+      )
+    ]);
+    assertEquals(block2.receipts[0].result.expectErr(), 'u101');
   },
 });
 
@@ -48,6 +57,15 @@ Clarinet.test({
     assertEquals(block.receipts.length, 3);
     assertEquals(block.receipts[1].result.expectOk(), true);
     assertEquals(block.receipts[2].result.expectOk(), true);
+    
+    // Try invalid amount
+    let block2 = chain.mineBlock([
+      Tx.contractCall("vault", "deposit",
+        [types.uint(0)],
+        wallet_1.address
+      )
+    ]);
+    assertEquals(block2.receipts[0].result.expectErr(), 'u106');
   },
 });
 
@@ -67,6 +85,8 @@ Clarinet.test({
       )
     ]);
     
-    // Add more time-lock tests
+    assertEquals(block.receipts.length, 2);
+    assertEquals(block.receipts[0].result.expectOk(), true);
+    assertEquals(block.receipts[1].result.expectOk(), true);
   },
 });
